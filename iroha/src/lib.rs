@@ -115,7 +115,7 @@ impl Iroha {
             domains,
         ))));
         let torii = Torii::new(
-            &config.peer_id.address.clone(),
+            &config.peer_id.address,
             Arc::clone(&world_state_view),
             transactions_sender.clone(),
             message_sender,
@@ -178,10 +178,11 @@ impl Iroha {
         let voting_handle = task::spawn(async move {
             loop {
                 if !sumeragi.write().await.voting_in_progress().await {
+                    let pending_transactions = queue.write().await.pop_pending_transactions();
                     sumeragi
                         .write()
                         .await
-                        .round(queue.write().await.pop_pending_transactions())
+                        .round(pending_transactions)
                         .await
                         .expect("Round failed.");
                 }

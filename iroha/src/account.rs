@@ -32,6 +32,19 @@ impl Account {
         }
     }
 
+    /// Constructor of the detached `Account` entity without signatories.
+    ///
+    /// This method can be used to create an `Account` which should be registered in the domain.
+    /// This method should not be used to create an `Account` to work with as a part of the Iroha
+    /// State.
+    pub fn unowned(account_name: &str, domain_name: &str) -> Self {
+        Account {
+            id: Id::new(account_name, domain_name),
+            assets: BTreeMap::new(),
+            signatories: Vec::new(),
+        }
+    }
+
     /// Constructor of the `Transfer<Account, Asset, Account>` Iroha Special Instruction.
     pub fn transfer_asset_to(
         &self,
