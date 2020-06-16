@@ -137,12 +137,18 @@ pub mod isi {
             PermissionInstruction::CanRegisterAssetDefinition(authority, None)
                 .execute(world_state_view)?;
             let asset = self.object.clone();
-            world_state_view
+            let domain = world_state_view
                 .domain(&self.destination_id)
-                .ok_or("Failed to find domain.")?
-                .asset_definitions
-                .insert(asset.id.clone(), asset);
-            Ok(())
+                .ok_or("Failed to find domain.")?;
+            if domain.asset_definitions.contains_key(&asset.id) {
+                Err(format!(
+                    "Domain already contains an asset definition with an Id: {:?}",
+                    &asset.id
+                ))
+            } else {
+                domain.asset_definitions.insert(asset.id.clone(), asset);
+                Ok(())
+            }
         }
     }
 }
