@@ -1,8 +1,8 @@
 //! This module contains query related Iroha functionality.
 
-use crate::{account, asset};
 use crate::crypto::Signature;
-use iroha_derive::Io;
+use crate::{account, asset};
+// use iroha_derive::Io;
 use parity_scale_codec::{Decode, Encode};
 use alloc::{
     string::String,
