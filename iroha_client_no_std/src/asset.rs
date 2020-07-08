@@ -1,13 +1,16 @@
 //! This module contains `Asset` structure and it's implementation.
 
 use crate::prelude::*;
-use parity_scale_codec::{Decode, Encode};
-use std::{
-    collections::BTreeMap,
+use alloc::{collections::BTreeMap, string::String};
+use core::{
     fmt::{self, Display, Formatter},
     hash::Hash,
 };
-
+use parity_scale_codec::{Decode, Encode};
+use alloc::{
+    vec::Vec,
+};
+use crate::alloc::string::ToString;
 /// Asset entity represents some sort of commodity or value.
 #[derive(Clone, Debug, Encode, Decode)]
 pub struct AssetDefinition {
@@ -102,7 +105,7 @@ impl Asset {
 ///
 /// let id = Id::new("xor", "soramitsu");
 /// ```
-#[derive(Clone, Debug, PartialEq, PartialOrd, Ord, Eq, std::hash::Hash, Encode, Decode)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Ord, Eq, Hash, Encode, Decode)]
 pub struct AssetDefinitionId {
     /// Asset's name.
     pub name: String,
@@ -177,7 +180,7 @@ pub mod isi {
     use iroha_derive::*;
 
     /// Enumeration of all legal Asset related Instructions.
-    #[derive(Clone, Debug, Io, Encode, Decode)]
+    #[derive(Clone, Debug, Encode, Decode)]
     pub enum AssetInstruction {
         /// Variant of the generic `Mint` instruction for `u32` --> `Asset`.
         MintAsset(u32, <Asset as Identifiable>::Id),
@@ -198,13 +201,13 @@ pub mod isi {
 pub mod query {
     use super::*;
     use crate::query::IrohaQuery;
+    use chrono::Utc;
     use iroha_derive::{IntoQuery, Io};
     use parity_scale_codec::{Decode, Encode};
-    use std::time::SystemTime;
 
     /// To get the state of all assets in an account (a balance),
     /// GetAccountAssets query can be used.
-    #[derive(Clone, Debug, Io, IntoQuery, Encode, Decode)]
+    #[derive(Clone, Debug, Encode, Decode)]
     pub struct GetAccountAssets {
         account_id: <Account as Identifiable>::Id,
     }
@@ -221,13 +224,9 @@ pub mod query {
         pub fn build_request(account_id: <Account as Identifiable>::Id) -> QueryRequest {
             let query = GetAccountAssets { account_id };
             QueryRequest {
-                timestamp: SystemTime::now()
-                    .duration_since(SystemTime::UNIX_EPOCH)
-                    .expect("Failed to get System Time.")
-                    .as_millis()
-                    .to_string(),
+                timestamp: Utc::now().timestamp_millis().to_string(),
                 signature: Option::None,
-                query: query.into(),
+                query: IrohaQuery::GetAccountAssets(query),
             }
         }
     }
