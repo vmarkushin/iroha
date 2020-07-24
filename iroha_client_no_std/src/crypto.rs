@@ -38,7 +38,7 @@ pub struct KeyPair {
     Copy, Encode, Decode, Ord, PartialEq, Eq, PartialOrd, Debug, Clone, Hash, Default, Deserialize,
 )]
 pub struct PublicKey {
-    inner: [u8; 32],
+    pub inner: [u8; 32],
 }
 
 impl Deref for PublicKey {
@@ -70,7 +70,7 @@ impl TryFrom<Vec<u8>> for PublicKey {
 /// Private Key used in signatures.
 #[derive(Clone, Debug, Deserialize, PartialEq, Default)]
 pub struct PrivateKey {
-    inner: Vec<u8>,
+    pub inner: Vec<u8>,
 }
 
 impl TryFrom<Vec<u8>> for PrivateKey {
