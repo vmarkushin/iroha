@@ -172,7 +172,7 @@ impl AcceptedTransaction {
             Duration::from_millis(self.payload.time_to_live_ms),
             transaction_time_to_live,
         );
-        dbg!(elapsed) > dbg!(ttl)
+        elapsed > ttl
     }
 
     /// Move transaction lifecycle forward by checking an ability to apply instructions to the
