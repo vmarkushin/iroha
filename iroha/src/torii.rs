@@ -202,7 +202,7 @@ async fn handle_connections(
 
 #[log]
 async fn handle_request(state: State<ToriiState>, request: Request) -> Result<Response, String> {
-    println!("handle req");
+    println!("handle req {}", request.url());
     match request.url() {
         uri::INSTRUCTIONS_URI => match SignedTransaction::try_from(request.payload().to_vec()) {
             Ok(transaction) => {
