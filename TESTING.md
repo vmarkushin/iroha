@@ -1,6 +1,6 @@
 # Testing Instruction
 
-1. Install rust: https://www.rust-lang.org/tools/install
+1. Install rust and other dependencies: https://substrate.dev/docs/en/knowledgebase/getting-started/
 2. Clone repository
 `git clone --branch polkadot_bridge https://github.com/vmarkushin/iroha.git && cd iroha`
 4. Run iroha
