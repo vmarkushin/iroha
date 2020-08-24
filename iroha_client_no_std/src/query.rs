@@ -2,7 +2,6 @@
 
 use crate::crypto::Signature;
 use crate::{account, domain};
-use alloc::{string::String, vec::Vec};
 use parity_scale_codec::{Decode, Encode};
 use alloc::{
     string::String,
