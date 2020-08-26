@@ -1,10 +1,11 @@
 //! This module contains `Domain` structure and related implementations.
 
 use crate::prelude::*;
-use alloc::{collections::BTreeMap, string::String};
+use alloc::{collections::BTreeMap, string::String, vec::Vec};
 // use iroha_derive::*;
 use parity_scale_codec::{Decode, Encode};
 type Name = String;
+
 /// Named group of `Account` and `Asset` entities.
 #[derive(Debug, Clone, Encode, Decode)]
 pub struct Domain {
@@ -55,6 +56,28 @@ pub mod query {
     use crate::query::IrohaQuery;
     use parity_scale_codec::{Decode, Encode};
 
+    /// Get information related to all domains.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllDomains {}
+
+    /// Result of the `GetAllDomains` execution.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllDomainsResult {
+        /// Domain information.
+        pub domains: Vec<Domain>,
+    }
+
+    impl GetAllDomains {
+        /// Build a `GetAllDomains` query in the form of a `QueryRequest`.
+        pub fn build_request() -> QueryRequest {
+            let query = GetAllDomains {};
+            QueryRequest {
+                timestamp: "".into(),
+                query: IrohaQuery::GetAllDomains(query),
+            }
+        }
+    }
+
     /// Get information related to the domain with a specified `domain_name`.
     #[derive(Clone, Debug, Encode, Decode)]
     pub struct GetDomain {
@@ -75,7 +98,6 @@ pub mod query {
             let query = GetDomain { domain_name };
             QueryRequest {
                 timestamp: "".into(),
-                signature: Option::None,
                 query: IrohaQuery::GetDomain(query),
             }
         }

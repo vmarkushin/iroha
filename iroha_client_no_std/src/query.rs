@@ -1,7 +1,7 @@
 //! This module contains query related Iroha functionality.
 
 use crate::crypto::Signature;
-use crate::{account, domain};
+use crate::{account, domain, asset};
 use parity_scale_codec::{Decode, Encode};
 use alloc::{
     string::String,
@@ -31,12 +31,20 @@ pub struct SignedQueryRequest {
 /// Enumeration of all legal Iroha Queries.
 #[derive(Clone, Debug, Encode, Decode)]
 pub enum IrohaQuery {
+    /// Query all Assets.
+    GetAllAssets(asset::query::GetAllAssets),
+    /// Query all Assets Definitions.
+    GetAllAssetsDefinitions(asset::query::GetAllAssetsDefinitions),
     /// Query all Assets related to the Account.
     GetAccountAssets(asset::query::GetAccountAssets),
     /// Query all Assets with defined Definition related to the Account.
     GetAccountAssetsWithDefinition(asset::query::GetAccountAssetsWithDefinition),
+    /// Query all Accounts.
+    GetAllAccounts(account::query::GetAllAccounts),
     /// Query Account information.
     GetAccount(account::query::GetAccount),
+    /// Query Domains information.
+    GetAllDomains(domain::query::GetAllDomains),
     /// Query Domain information.
     GetDomain(domain::query::GetDomain),
 }
@@ -44,12 +52,20 @@ pub enum IrohaQuery {
 /// Result of queries execution.
 #[derive(Debug, Encode, Decode)]
 pub enum QueryResult {
+    /// Query all Assets.
+    GetAllAssets(asset::query::GetAllAssetsResult),
+    /// Query all Assets Definitions.
+    GetAllAssetsDefinitions(asset::query::GetAllAssetsDefinitionsResult),
     /// Query all Assets related to the Account result.
     GetAccountAssets(asset::query::GetAccountAssetsResult),
     /// Query all Assets with defined Definition related to the Account.
     GetAccountAssetsWithDefinition(asset::query::GetAccountAssetsWithDefinitionResult),
+    /// Query all Accounts.
+    GetAllAccounts(account::query::GetAllAccountsResult),
     /// Query Account information.
     GetAccount(account::query::GetAccountResult),
+    /// Query Domains information.
+    GetAllDomains(domain::query::GetAllDomainsResult),
     /// Query Domain information.
     GetDomain(domain::query::GetDomainResult),
 }

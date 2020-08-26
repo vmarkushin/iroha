@@ -125,6 +125,17 @@ pub mod query {
     // use iroha_derive::*;
     use parity_scale_codec::{Decode, Encode};
 
+    /// Get information related to all accounts.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAccounts {}
+
+    /// Result of the `GetAllAccounts` execution.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAccountsResult {
+        /// Accounts information.
+        pub accounts: Vec<Account>,
+    }
+
     /// Get information related to the account with a specified `account_id`.
     #[derive(Clone, Debug, Encode, Decode)]
     pub struct GetAccount {
@@ -145,7 +156,6 @@ pub mod query {
             let query = GetAccount { account_id };
             QueryRequest {
                 timestamp: 0.to_string(), //Utc::now().naive_local().timestamp_millis().to_string(),
-                signature: Option::None,
                 query: IrohaQuery::GetAccount(query),
             }
         }

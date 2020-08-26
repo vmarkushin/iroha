@@ -202,6 +202,30 @@ pub mod query {
     use crate::query::IrohaQuery;
     use parity_scale_codec::{Decode, Encode};
 
+    /// To get the state of all assets,
+    /// GetAllAssets query can be used.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAssets {}
+
+    /// Result of the `GetAllAssets` execution.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAssetsResult {
+        /// Assets types which are needed to be included in query result.
+        pub assets: Vec<Asset>,
+    }
+
+    /// To get the state of all assets,
+    /// GetAllAssetsDefinitions query can be used.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAssetsDefinitions {}
+
+    /// Result of the `GetAllAssetsDefinitions` execution.
+    #[derive(Clone, Debug, Encode, Decode)]
+    pub struct GetAllAssetsDefinitionsResult {
+        /// Assets types which are needed to be included in query result.
+        pub assets_definitions: Vec<AssetDefinition>,
+    }
+
     /// To get the state of all assets in an account (a balance),
     /// GetAccountAssets query can be used.
     #[derive(Clone, Debug, Encode, Decode)]
@@ -222,7 +246,6 @@ pub mod query {
             let query = GetAccountAssets { account_id };
             QueryRequest {
                 timestamp: "".into(),
-                signature: Option::None,
                 query: IrohaQuery::GetAccountAssets(query),
             }
         }
@@ -255,7 +278,6 @@ pub mod query {
             };
             QueryRequest {
                 timestamp: "".to_string(),
-                signature: Option::None,
                 query: IrohaQuery::GetAccountAssetsWithDefinition(query),
             }
         }
