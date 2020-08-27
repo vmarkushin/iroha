@@ -5,7 +5,6 @@ use crate::{account, domain, asset};
 use parity_scale_codec::{Decode, Encode};
 use alloc::{
     string::String,
-    vec::Vec,
 };
 
 /// I/O ready structure to send queries.

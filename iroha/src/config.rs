@@ -65,7 +65,7 @@ impl Configuration {
         let mut configuration: Configuration = serde_json::from_str(s)
             .map_err(|e| format!("Failed to deserialize json from reader: {}", e))?;
         configuration.sumeragi_configuration.key_pair = KeyPair {
-            public_key: configuration.public_key,
+            public_key: configuration.public_key.clone(),
             private_key: configuration.private_key.clone(),
         };
         configuration.sumeragi_configuration.peer_id = PeerId::new(

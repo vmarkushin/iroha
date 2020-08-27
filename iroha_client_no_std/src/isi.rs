@@ -31,7 +31,7 @@ pub enum Instruction {
     Event(crate::event::isi::EventInstruction),
     /// This variant of Iroha Special Instruction composes two other instructions into one, and
     /// executes them both.
-    Compose(Box<Instruction>, Box<Instruction>),
+    Pair(Box<Instruction>, Box<Instruction>),
     /// This variant of Iroha Special Instruction composes several other instructions into one, and
     /// executes them one by one. If some instruction fails - the whole sequence will fail.
     Sequence(Vec<Instruction>),

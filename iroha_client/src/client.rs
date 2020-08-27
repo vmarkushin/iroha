@@ -10,7 +10,7 @@ use std::{
 
 pub struct Client {
     torii_url: String,
-    key_pair: KeyPair,
+    pub key_pair: KeyPair,
     proposed_transaction_ttl_ms: u64,
 }
 
@@ -57,7 +57,7 @@ impl Client {
     }
 
     /// Instructions API entry point. Submits several Iroha Special Instructions to `Iroha` peers.
-    pub async fn submit_all(&mut self, instructions: Vec<Instruction>) -> Result<(), String> {
+    pub async fn submit_all(&self, instructions: Vec<Instruction>) -> Result<(), String> {
         let network = Network::new(&self.torii_url);
         let transaction: SignedTransaction = Transaction::new(
             instructions,

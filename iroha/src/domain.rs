@@ -168,7 +168,8 @@ pub mod isi {
                 .domain(&self.destination_id)
                 .ok_or("Failed to find domain.")?
                 .asset_definitions
-                .insert(asset.id.clone(), asset);
+                .insert(asset.id.clone(), asset.clone());
+            println!("registered AssetDefinition {:#?} in {:#?}", asset, self.destination_id);
             Ok(Output::RegisterAsset(world_state_view))
         }
     }

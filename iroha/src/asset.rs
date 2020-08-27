@@ -370,6 +370,7 @@ pub mod isi {
             )
             .execute(world_state_view)?;
             let mut world_state_view = world_state_view.clone();
+            println!("already registered {:#?}", world_state_view.domain(&self.destination_id.definition_id.domain_name).unwrap().asset_definitions);
             world_state_view
                 .asset_definition(&self.destination_id.definition_id)
                 .ok_or(format!(

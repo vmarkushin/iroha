@@ -15,10 +15,13 @@ use alloc::{
 };
 // use iroha_derive::*;
 use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "std")]
 use serde::Deserialize;
+
 /// Peer's identification.
+#[cfg_attr(feature = "std", derive(Deserialize))]
 #[derive(
-    Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash, Default, Deserialize,
+    Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash, Default,
 )]
 pub struct PeerId {
     /// Address of the Peer's entrypoint.
@@ -32,7 +35,7 @@ impl PeerId {
     pub fn new(address: &str, public_key: &PublicKey) -> Self {
         PeerId {
             address: address.to_string(),
-            public_key: *public_key,
+            public_key: public_key.clone(),
         }
     }
 }
@@ -141,7 +144,7 @@ pub mod isi {
         /// Variant of the generic `Add` instruction for `Domain` --> `Peer`.
         AddDomain(String, PeerId),
         /// Variant of the generic `Add` instruction for `Instruction` --> `Peer`.
-        AddListener(Box<Instruction>, PeerId),
+        AddTrigger(Box<Instruction>, PeerId),
         /// Instruction to add a peer to the network.
         AddPeer(PeerId),
     }

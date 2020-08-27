@@ -350,8 +350,10 @@ async fn handle_request(state: State<ToriiState>, request: Request) -> Result<Re
                     Message::GetBlocksFromHeight(n, _) => {
                         let n = n as usize;
                         if n < blocks.size_hint().1.unwrap() {
+                            let message1 = Message::ShareBlocks(blocks.skip(n).collect(), PeerId::new("", pk));
+                            dbg!(&message1);
                             Ok(Response::Ok(
-                                Message::ShareBlocks(blocks.skip(n).collect(), PeerId::new("", pk))
+                                message1
                                     .encode(),
                             ))
                         } else {

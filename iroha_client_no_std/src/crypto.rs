@@ -8,6 +8,7 @@ use core::{
     fmt::{self, Debug, Formatter},
 };
 use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "std")]
 use serde::{Serialize, Deserialize};
 // use ursa::{
 //     blake2::{
@@ -20,11 +21,16 @@ use serde::{Serialize, Deserialize};
 // use sp_core::sr25519::Public;
 // use sp_core::hash::H256;
 
+pub const HASH_LENGTH: usize = 32;
+pub const ED_25519: &str = "ed25519";
+pub const SECP_256_K1: &str = "secp256k1";
+
 /// Represents hash of Iroha entities like `Block` or `Transaction.
-pub type Hash = [u8; 32];
+pub type Hash = [u8; HASH_LENGTH];
 
 /// Pair of Public and Private keys.
-#[derive(Clone, Debug, Deserialize, Default)]
+#[cfg_attr(feature = "std", derive(Deserialize))]
+#[derive(Clone, Debug, Default)]
 pub struct KeyPair {
     /// Public Key.
     pub public_key: PublicKey,
@@ -33,43 +39,60 @@ pub struct KeyPair {
 }
 
 /// Public Key used in signatures.
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[derive(
-    Copy, Encode, Decode, Ord, PartialEq, Eq, PartialOrd, Debug, Clone, Hash, Default, Deserialize, Serialize,
+    Encode, Decode, Ord, PartialEq, Eq, PartialOrd, Debug, Clone, Hash, Default,
 )]
 pub struct PublicKey {
-    pub inner: [u8; 32],
+    pub digest_function: String,
+    pub payload: Vec<u8>,
 }
 
 impl Deref for PublicKey {
-    type Target = [u8; 32];
+    type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
-}
-
-impl TryFrom<Vec<u8>> for PublicKey {
-    type Error = String;
-
-    fn try_from(vector: Vec<u8>) -> Result<Self, Self::Error> {
-        if vector.len() > 32 {
-            Err(format!(
-                "Failed to build PublicKey from vector: {:?}, expected length 32, found {}.",
-                &vector,
-                vector.len()
-            ))
-        } else {
-            let mut inner = [0; 32];
-            inner.copy_from_slice(&vector);
-            Ok(PublicKey { inner })
-        }
+        &self.payload
     }
 }
 
 /// Private Key used in signatures.
-#[derive(Clone, Debug, Deserialize, PartialEq, Default)]
+#[cfg_attr(feature = "std", derive(Deserialize))]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct PrivateKey {
-    pub inner: Vec<u8>,
+    pub digest_function: String,
+    #[serde(deserialize_with = "from_hex", serialize_with = "to_hex")]
+    pub payload: Vec<u8>,
+}
+
+/// Type of digest function.
+/// The corresponding byte codes are taken from [official multihash table](https://github.com/multiformats/multicodec/blob/master/table.csv)
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+pub enum DigestFunction {
+    Ed25519Pub = 0xed,
+    Secp256k1Pub = 0xe7,
+}
+
+#[derive(Eq, PartialEq, Debug)]
+pub struct Multihash {
+    pub digest_function: DigestFunction,
+    pub payload: Vec<u8>,
+}
+
+impl TryFrom<&Multihash> for PublicKey {
+    type Error = String;
+
+    fn try_from(multihash: &Multihash) -> Result<Self, Self::Error> {
+        match multihash.digest_function {
+            DigestFunction::Ed25519Pub => Ok(ED_25519.to_string()),
+            DigestFunction::Secp256k1Pub => Ok(SECP_256_K1.to_string()),
+        }
+            .map(|digest_function| PublicKey {
+                digest_function,
+                payload: multihash.payload.clone(),
+            })
+    }
 }
 
 impl TryFrom<Vec<u8>> for PrivateKey {
@@ -83,7 +106,7 @@ impl TryFrom<Vec<u8>> for PrivateKey {
                 vector.len()
             ))
         } else {
-            Ok(PrivateKey { inner: vector })
+            Ok(PrivateKey { digest_function: ED_25519.to_owned(), payload: vector })
         }
     }
 }
@@ -132,7 +155,7 @@ pub struct Signature {
     /// public-key of an approved authority.
     pub public_key: PublicKey,
     /// Ed25519 signature is placed here.
-    pub signature: Ed25519Signature,
+    pub signature: Vec<u8>,
 }
 
 // impl Signature {
@@ -196,7 +219,7 @@ impl Signatures {
 
     /// Adds a signature. If the signature with this key was present, replaces it.
     pub fn add(&mut self, signature: Signature) {
-        let _option = self.signatures.insert(signature.public_key, signature);
+        let _option = self.signatures.insert(signature.clone().public_key, signature);
     }
 
     /// Whether signatures contain a signature with the specified `public_key`
@@ -227,6 +250,20 @@ impl Signatures {
             .cloned()
             .collect()
     }
+}
+
+fn from_hex<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+{
+    hex::decode(String::deserialize(deserializer)?).map_err(serde::de::Error::custom)
+}
+
+fn to_hex<S>(payload: &[u8], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+{
+    serializer.serialize_str(&hex::encode(payload))
 }
 
 #[cfg(test)]

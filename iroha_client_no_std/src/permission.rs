@@ -12,27 +12,37 @@ pub struct Permissions {
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq)]
 pub enum Permission {
+    /// Allows to do anything.
     Anything,
+    /// Allows to add domains.
     AddDomain,
-    AddListener,
+    /// Allows to add triggers.
+    AddTrigger,
+    /// Allows to register asset definition.
     RegisterAssetDefinition(Option<<Domain as Identifiable>::Id>),
+    /// Allows to register account.
     RegisterAccount(Option<<Domain as Identifiable>::Id>),
+    /// Allows to register asset.
     MintAsset(
         Option<<Domain as Identifiable>::Id>,
         Option<<AssetDefinition as Identifiable>::Id>,
     ),
+    /// Allows to demint asset.
     DemintAsset(
         Option<<Domain as Identifiable>::Id>,
         Option<<AssetDefinition as Identifiable>::Id>,
     ),
+    /// Allows to transfer asset.
     TransferAsset(
         Option<<Domain as Identifiable>::Id>,
         Option<<AssetDefinition as Identifiable>::Id>,
     ),
+    /// Allows to add signatory.
     AddSignatory(
         Option<<Domain as Identifiable>::Id>,
         Option<<Account as Identifiable>::Id>,
     ),
+    /// Allows to remove signatory.
     RemoveSignatory(
         Option<<Domain as Identifiable>::Id>,
         Option<<Account as Identifiable>::Id>,
@@ -59,37 +69,47 @@ pub mod isi {
     /// Iroha special instructions related to `Permission`.
     #[derive(Clone, Debug, Encode, Decode)]
     pub enum PermissionInstruction {
+        /// Should be able to do anything.
         CanAnything(<Account as Identifiable>::Id),
-        CanAddListener(<Account as Identifiable>::Id),
+        /// Should be able to add triggers.
+        CanAddTrigger(<Account as Identifiable>::Id),
+        /// Should be able to add domain.
         CanAddDomain(<Account as Identifiable>::Id),
+        /// Should be able to register account.
         CanRegisterAccount(
             <Account as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to register asset definition.
         CanRegisterAssetDefinition(
             <Account as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to transfer asset.
         CanTransferAsset(
             <Account as Identifiable>::Id,
             <AssetDefinition as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to add signatory.
         CanAddSignatory(
             <Account as Identifiable>::Id,
             <Account as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to remove signatory.
         CanRemoveSignatory(
             <Account as Identifiable>::Id,
             <Account as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to mint asset.
         CanMintAsset(
             <Account as Identifiable>::Id,
             <AssetDefinition as Identifiable>::Id,
             Option<<Domain as Identifiable>::Id>,
         ),
+        /// Should be able to demint asset.
         CanDemintAsset(
             <Account as Identifiable>::Id,
             <AssetDefinition as Identifiable>::Id,
@@ -102,7 +122,7 @@ pub mod isi {
             match instruction {
                 PermissionInstruction::CanAnything(_) => Permission::Anything,
                 PermissionInstruction::CanAddDomain(_) => Permission::AddDomain,
-                PermissionInstruction::CanAddListener(_) => Permission::AddListener,
+                PermissionInstruction::CanAddTrigger(_) => Permission::AddTrigger,
                 PermissionInstruction::CanRegisterAccount(_, option_domain_id) => {
                     Permission::RegisterAccount(option_domain_id.clone())
                 }

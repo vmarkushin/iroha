@@ -92,7 +92,7 @@ impl Instruction {
         authority: <Account as Identifiable>::Id,
         world_state_view: &WorldStateView,
     ) -> Result<InstructionResult, String> {
-        match self {
+        match dbg!(self) {
             Instruction::Peer(origin) => {
                 let output = origin.execute(authority, world_state_view)?;
                 Ok(InstructionResult {
