@@ -2467,6 +2467,16 @@ pub mod isi {
                     .expect("failed to get optimal asset amounts");
             debug_assert_eq!(amount_a, 4000);
             debug_assert_eq!(amount_b, 2000);
+            // add liquidity not meeting the min amount for a
+            let result =
+                xyk_pool::get_optimal_deposit_amounts(10000, 5000, 5000, 2000, 5000, 2000)
+                    .unwrap_err();
+            debug_assert_eq!(result, "insufficient a amount");
+            // add liquidity not meeting the min amount for b
+            let result =
+                xyk_pool::get_optimal_deposit_amounts(10000, 5000, 5000, 3000, 5000, 3000)
+                    .unwrap_err();
+            debug_assert_eq!(result, "insufficient b amount");
         }
 
         #[test]
@@ -2562,6 +2572,9 @@ pub mod isi {
             testkit.add_transfer_permission("Trader@Soramitsu", "DOT#Polkadot");
             testkit.mint_asset("XOR#Soramitsu", "Trader@Soramitsu", 7000u32);
             testkit.mint_asset("DOT#Polkadot", "Trader@Soramitsu", 7000u32);
+            // After minting we should have exactly the minted amount
+            testkit.check_asset_amount("Trader@Soramitsu", "XOR#Soramitsu", 7000u32);
+            testkit.check_asset_amount("Trader@Soramitsu", "DOT#Polkadot", 7000u32);
 
             // add minted tokens to the pool from account
             let desired_base: u32 = 5000;
@@ -2582,6 +2595,9 @@ pub mod isi {
             )
             .execute(account_id.clone(), &mut testkit.world_state_view)
             .expect("add liquidity failed");
+            // We added 5k/7k of the base tokens and 7k/7k of target
+            testkit.check_asset_amount("Trader@Soramitsu", "XOR#Soramitsu", 2000u32);
+            testkit.check_asset_amount("Trader@Soramitsu", "DOT#Polkadot", 0u32);
 
             let amount_in: u32 = 2000;
             let amount_out_min: u32 = 0;
