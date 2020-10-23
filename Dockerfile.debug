@@ -1,5 +1,10 @@
-FROM debian:stable-slim
-COPY target/debug/iroha .
-COPY iroha/config.json .
-RUN apt-get update && apt-get -y upgrade && apt-get install -y libssl-dev
-CMD ["./iroha"]
+FROM rust:1.47
+COPY ./iroha_macro /iroha_root/iroha_macro
+COPY ./iroha_network /iroha_root/iroha_network
+COPY ./iroha_logger /iroha_root/iroha_logger
+COPY ./iroha /iroha_root/iroha
+COPY ./Cargo.lock /iroha_root/iroha/Cargo.lock
+WORKDIR /iroha_root/iroha
+RUN cargo build --features "dex"
+RUN cp ./config.json ./target/debug/config.json
+CMD ["/iroha_root/iroha/target/debug/iroha"]
